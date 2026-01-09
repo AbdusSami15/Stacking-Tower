@@ -9,7 +9,8 @@
     create() {
       this.cameras.main.setBackgroundColor(0x0b0f14);
 
-      // Unlock audio on first user gesture (mobile)
+      window.AudioUtil.setScene(this);
+
       this.input.once("pointerdown", () => window.AudioUtil.unlock());
 
       const hs = window.StorageUtil.loadHighScore();
@@ -17,8 +18,8 @@
       this.startUI = window.UIFactory.createStartScreen(
         this,
         hs,
-        () => this.scene.start("GameScene"),
-        () => this.showTutorial()
+        () => { window.AudioUtil.ui(); this.scene.start("GameScene"); },
+        () => { window.AudioUtil.ui(); this.showTutorial(); }
       );
 
       this.tutorial = window.UIFactory.createTutorialOverlay(this, () => {
@@ -26,15 +27,11 @@
         this.tutorial.hide();
       });
 
-      // If first time, show tutorial once
-      if (!window.StorageUtil.isTutorialSeen()) {
-        this.showTutorial();
-      }
+      if (!window.StorageUtil.isTutorialSeen()) this.showTutorial();
     }
 
     showTutorial() {
-      if (!this.tutorial) return;
-      this.tutorial.show();
+      if (this.tutorial) this.tutorial.show();
     }
   }
 

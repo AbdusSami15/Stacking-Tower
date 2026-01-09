@@ -1,27 +1,37 @@
 (function () {
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
-  class TinySfx {
+  class HybridSfx {
     constructor() {
+      this.enabled = true;
+
+      // Phaser scene reference (so we can play loaded audio)
+      this.scene = null;
+
+      // WebAudio fallback
       this.ctx = null;
       this.master = null;
-      this.enabled = true;
       this.unlocked = false;
+      this.volume01 = 0.18;
     }
 
-    init() {
+    setScene(scene) {
+      this.scene = scene || null;
+    }
+
+    initWebAudio() {
       if (this.ctx) return;
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
 
       this.ctx = new AudioCtx();
       this.master = this.ctx.createGain();
-      this.master.gain.value = 0.18;
+      this.master.gain.value = this.volume01;
       this.master.connect(this.ctx.destination);
     }
 
     unlock() {
-      this.init();
+      this.initWebAudio();
       if (!this.ctx || this.unlocked) return;
 
       const now = this.ctx.currentTime;
@@ -43,14 +53,28 @@
 
     setEnabled(v) { this.enabled = !!v; }
     toggle() { this.enabled = !this.enabled; return this.enabled; }
+
     setVolume(v01) {
-      if (!this.master) return;
-      this.master.gain.value = clamp(v01, 0, 1);
+      this.volume01 = clamp(v01, 0, 1);
+      if (this.master) this.master.gain.value = this.volume01;
+    }
+
+    // Try Phaser sound first (if key exists), else beep fallback
+    playKey(key, fallbackFn) {
+      if (!this.enabled) return;
+
+      const s = this.scene;
+      if (s && s.sound && s.cache && s.cache.audio && s.cache.audio.exists(key)) {
+        s.sound.play(key, { volume: 0.7 });
+        return;
+      }
+
+      if (fallbackFn) fallbackFn();
     }
 
     beep(freq, dur, type, vol) {
       if (!this.enabled) return;
-      this.init();
+      this.initWebAudio();
       if (!this.ctx || !this.master) return;
 
       const now = this.ctx.currentTime;
@@ -72,11 +96,13 @@
       osc.stop(now + dur + 0.02);
     }
 
-    tap()     { this.beep(720, 0.07, "square", 0.9); }
-    cut()     { this.beep(520, 0.09, "triangle", 0.9); }
-    perfect() { this.beep(920, 0.12, "sine", 1.0); }
-    lose()    { this.beep(180, 0.28, "sawtooth", 1.0); }
+    ui()      { this.playKey("ui",      () => this.beep(640, 0.06, "sine",     0.8)); }
+    tap()     { this.playKey("tap",     () => this.beep(720, 0.07, "square",   0.9)); }
+    cut()     { this.playKey("cut",     () => this.beep(520, 0.09, "triangle", 0.9)); }
+    perfect() { this.playKey("perfect", () => this.beep(920, 0.12, "sine",     1.0)); }
+    combo()   { this.playKey("combo",   () => this.beep(1080,0.14, "sine",     1.0)); }
+    lose()    { this.playKey("lose",    () => this.beep(180, 0.28, "sawtooth", 1.0)); }
   }
 
-  window.AudioUtil = new TinySfx();
+  window.AudioUtil = new HybridSfx();
 })();
