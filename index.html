@@ -2,22 +2,78 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <!-- Mobile safe area + scaling -->
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+
   <title>Stacking Tower</title>
+
+  <!-- UI Styles -->
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body>
-  <div id="game"></div>
 
-  <!-- Phaser 3 CDN -->
+<body>
+
+  <!-- =========================
+       GAME CANVAS CONTAINER
+       ========================= -->
+  <div id="game-wrap">
+    <div id="game"></div>
+  </div>
+
+  <!-- =========================
+       HTML UI OVERLAY
+       ========================= -->
+  <div id="ui-root" class="ui-hidden">
+
+    <!-- TOP BAR -->
+    <div class="ui-topbar">
+      <div class="ui-left">
+        <button id="btn-settings" class="ui-btn">⚙</button>
+      </div>
+
+      <div class="ui-center">
+        <div class="ui-score">
+          <div class="ui-label">SCORE</div>
+          <div id="txt-score" class="ui-value">0</div>
+        </div>
+      </div>
+
+      <div class="ui-right">
+        <button id="btn-sound" class="ui-btn">🔊</button>
+      </div>
+    </div>
+
+    <!-- CENTER PROMPT -->
+    <div id="ui-centerPrompt" class="ui-centerPrompt ui-hidden">
+      <div id="txt-prompt" class="ui-prompt">TAP TO DROP</div>
+    </div>
+
+    <!-- BOTTOM BAR -->
+    <div class="ui-bottombar">
+      <button id="btn-restart" class="ui-btnWide ui-hidden">
+        RESTART
+      </button>
+
+      <button id="btn-play" class="ui-btnWide">
+        PLAY
+      </button>
+    </div>
+
+  </div>
+
+  <!-- =========================
+       PHASER (GLOBAL)
+       ========================= -->
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
 
-  <!-- Game files -->
-  <script src="js/constants.js"></script>
-  <script src="js/storage.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/BootScene.js"></script>
-  <script src="js/GameScene.js"></script>
-  <script src="js/main.js"></script>
+  <!-- =========================
+       GAME ENTRY (ONLY THIS)
+       ========================= -->
+  <script type="module" src="js/app.js?v=3"></script>
+
 </body>
 </html>
