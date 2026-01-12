@@ -2,78 +2,97 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-
-  <!-- Mobile safe area + scaling -->
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Stacking Tower</title>
-
-  <!-- UI Styles -->
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="./css/style.css" />
 </head>
 
 <body>
-
-  <!-- =========================
-       GAME CANVAS CONTAINER
-       ========================= -->
   <div id="game-wrap">
     <div id="game"></div>
-  </div>
 
-  <!-- =========================
-       HTML UI OVERLAY
-       ========================= -->
-  <div id="ui-root" class="ui-hidden">
+    <div id="ui-root">
+      <button id="btn-settings" class="ui-btn ui-icon left" aria-label="Settings">
+        <span class="ico">⚙</span>
+      </button>
 
-    <!-- TOP BAR -->
-    <div class="ui-topbar">
-      <div class="ui-left">
-        <button id="btn-settings" class="ui-btn">⚙</button>
+      <button id="btn-sound" class="ui-btn ui-icon right" aria-label="Sound">
+        <span id="ico-sound" class="ico">🔊</span>
+      </button>
+
+      <div id="ui-topCenter" class="ui-scoreCard">
+        <div id="txt-score" class="ui-score">0</div>
+        <div id="txt-best" class="ui-best">BEST 0</div>
       </div>
 
-      <div class="ui-center">
-        <div class="ui-score">
-          <div class="ui-label">SCORE</div>
-          <div id="txt-score" class="ui-value">0</div>
+      <!-- MENU -->
+      <div id="ui-menu" class="ui-menu">
+        <div class="menu-card">
+          <div class="menu-title">STACKING TOWER</div>
+          <div class="menu-sub">Drop blocks. Align perfectly for bonus.</div>
+
+          <div class="menu-stats">
+            <div class="stat">
+              <div class="statLabel">BEST</div>
+              <div id="txt-best2" class="statValue">0</div>
+            </div>
+            <div class="stat">
+              <div class="statLabel">LAST</div>
+              <div id="txt-last" class="statValue">0</div>
+            </div>
+          </div>
+
+          <button id="btn-play" class="btn-primary">PLAY</button>
+
+          <div class="menu-hint">Tap anywhere to drop</div>
         </div>
       </div>
 
-      <div class="ui-right">
-        <button id="btn-sound" class="ui-btn">🔊</button>
+      <!-- GAMEOVER -->
+      <div id="ui-gameover" class="ui-menu ui-hidden">
+        <div class="menu-card">
+          <div class="menu-title">GAME OVER</div>
+          <div class="menu-sub">Try again and beat your best.</div>
+
+          <div class="menu-stats">
+            <div class="stat">
+              <div class="statLabel">SCORE</div>
+              <div id="txt-overScore" class="statValue">0</div>
+            </div>
+            <div class="stat">
+              <div class="statLabel">BEST</div>
+              <div id="txt-overBest" class="statValue">0</div>
+            </div>
+          </div>
+
+          <button id="btn-restart" class="btn-primary">RESTART</button>
+          <button id="btn-backMenu" class="btn-ghost">BACK TO MENU</button>
+        </div>
+      </div>
+
+      <!-- SETTINGS MODAL -->
+      <div id="ui-settings" class="ui-modal ui-hidden">
+        <div class="modal-backdrop" id="btn-closeSettings"></div>
+        <div class="modal-card">
+          <div class="modal-title">Settings</div>
+
+          <div class="modal-row">
+            <div class="modal-label">Sound</div>
+            <button id="btn-sound2" class="btn-chip">Toggle</button>
+          </div>
+
+          <div class="modal-row">
+            <div class="modal-label">Restart</div>
+            <button id="btn-restart2" class="btn-chip">Restart</button>
+          </div>
+
+          <button id="btn-closeSettings2" class="btn-ghost">Close</button>
+        </div>
       </div>
     </div>
-
-    <!-- CENTER PROMPT -->
-    <div id="ui-centerPrompt" class="ui-centerPrompt ui-hidden">
-      <div id="txt-prompt" class="ui-prompt">TAP TO DROP</div>
-    </div>
-
-    <!-- BOTTOM BAR -->
-    <div class="ui-bottombar">
-      <button id="btn-restart" class="ui-btnWide ui-hidden">
-        RESTART
-      </button>
-
-      <button id="btn-play" class="ui-btnWide">
-        PLAY
-      </button>
-    </div>
-
   </div>
 
-  <!-- =========================
-       PHASER (GLOBAL)
-       ========================= -->
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
-
-  <!-- =========================
-       GAME ENTRY (ONLY THIS)
-       ========================= -->
-  <script type="module" src="js/app.js?v=3"></script>
-
+  <script type="module" src="./js/app.js"></script>
 </body>
 </html>
