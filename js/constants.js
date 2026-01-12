@@ -1,36 +1,59 @@
 (function () {
+  /**
+   * Game Constants
+   * Centralized configuration for the tower stacking game
+   */
+  
   window.GameConstants = {
-    STORAGE_KEY_HS: "stacking_highscore_v1",
-
-    DESIGN_W: 360,
-    DESIGN_H: 640,
-
-    BG_COLORS: [0x0b0f14, 0x0b1220, 0x0f172a, 0x111827, 0x0a1020],
-
-    BLOCK_COLORS: [0x3b82f6, 0x22c55e, 0xf59e0b, 0xec4899, 0x8b5cf6, 0x06b6d4],
-
-    UI: {
-      scoreX: 16,
-      scoreY: 12,
-      highY: 36
-    },
-
+    // Gameplay parameters
     GAMEPLAY: {
-      baseWidth: 220,
-      blockHeight: 28,
-      verticalStep: 28,
-
-      // horizontal movement padding from edges
-      edgePadding: 40,
-
-      // speed (px/sec) for tween movement
-      moveSpeed: 520,
-
-      // overlap threshold for "Perfect"
-      perfectThresholdPx: 3,
-
-      // perfect bonus score
-      perfectBonus: 1
-    }
+      // Block dimensions
+      baseWidth: 180,           // Starting width of blocks
+      blockHeight: 30,          // Height of each block
+      verticalStep: 32,         // Vertical spacing between blocks
+      minBlockWidth: 15,        // Minimum width before game over
+      
+      // Movement
+      moveSpeed: 350,           // Initial horizontal speed (px/sec)
+      speedIncreasePerLevel: 40, // Speed increase every 5 blocks
+      maxSpeed: 800,            // Maximum speed cap
+      
+      // Placement thresholds (in pixels)
+      perfectThresholdPx: 3,    // Perfect: within 3px of center
+      goodThresholdPx: 8,       // Good: within 8px of center
+      // Anything else is "OK"
+      
+      // Scoring
+      perfectBonus: 5,          // Bonus points for perfect placement
+      goodBonus: 2,             // Bonus points for good placement
+      
+      // Layout
+      edgePadding: 20           // Padding from screen edges
+    },
+    
+    // Visual colors (hex format)
+    BG_COLORS: [
+      0x1a1a2e,  // Dark blue-gray
+      0x16213e,  // Deep navy
+      0x0f3460,  // Ocean blue
+      0x533483,  // Purple
+      0x7b2869,  // Magenta
+      0x2c3e50,  // Slate
+      0x34495e,  // Charcoal
+      0x16a085   // Teal
+    ],
+    
+    BLOCK_COLORS: [
+      0x00d2ff,  // Cyan
+      0x3a86ff,  // Blue
+      0x8338ec,  // Purple
+      0xff006e,  // Pink
+      0xfb5607,  // Orange
+      0xffbe0b,  // Yellow
+      0x06ffa5,  // Mint
+      0xff1654,  // Red
+      0x00f5ff,  // Sky blue
+      0xb5179e   // Magenta
+    ]
   };
 })();
