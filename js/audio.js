@@ -1,3 +1,4 @@
+// js/audio.js
 (function () {
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
@@ -5,7 +6,6 @@
     constructor() {
       this.enabled = true;
 
-      // Phaser scene reference (so we can play loaded audio)
       this.scene = null;
 
       // WebAudio fallback
@@ -13,6 +13,16 @@
       this.master = null;
       this.unlocked = false;
       this.volume01 = 0.18;
+
+      // per-key volumes (match your preference)
+      this.keyVolumes = {
+        ui: 0.7,
+        tap: 0.8,
+        cut: 0.8,
+        perfect: 0.9,
+        combo: 0.9,
+        lose: 1.0,
+      };
     }
 
     setScene(scene) {
@@ -59,13 +69,21 @@
       if (this.master) this.master.gain.value = this.volume01;
     }
 
+    _isPhaserMuted() {
+      const s = this.scene;
+      if (!s || !s.game || !s.game.sound) return false;
+      return !!s.game.sound.mute;
+    }
+
     // Try Phaser sound first (if key exists), else beep fallback
     playKey(key, fallbackFn) {
       if (!this.enabled) return;
+      if (this._isPhaserMuted()) return;
 
       const s = this.scene;
       if (s && s.sound && s.cache && s.cache.audio && s.cache.audio.exists(key)) {
-        s.sound.play(key, { volume: 0.7 });
+        const vol = this.keyVolumes[key] ?? 0.7;
+        s.sound.play(key, { volume: vol });
         return;
       }
 
@@ -74,6 +92,8 @@
 
     beep(freq, dur, type, vol) {
       if (!this.enabled) return;
+      if (this._isPhaserMuted()) return;
+
       this.initWebAudio();
       if (!this.ctx || !this.master) return;
 

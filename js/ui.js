@@ -1,98 +1,114 @@
 // js/ui.js
-export default class HtmlUI {
-  constructor() {
-    this.txtScore = document.getElementById("txt-score");
-    this.txtBest = document.getElementById("txt-best");
+export const UI = (() => {
+  const $ = (id) => document.getElementById(id);
 
-    this.txtBest2 = document.getElementById("txt-best2");
-    this.txtLast = document.getElementById("txt-last");
+  const el = {
+    // Buttons
+    btnPlay: $("btn-play"),
+    btnRestart: $("btn-restart"),
+    btnBackMenu: $("btn-backMenu"),
+    btnSound: $("btn-sound"),
+    btnSettings: $("btn-settings"),
 
-    this.over = document.getElementById("ui-gameover");
-    this.menu = document.getElementById("ui-menu");
-    this.settings = document.getElementById("ui-settings");
+    // Labels
+    txtScore: $("txt-score"),
+    txtBestTop: $("txt-best"),
+    txtBestMenu: $("txt-best2"),
+    txtLast: $("txt-last"),
 
-    this.txtOverScore = document.getElementById("txt-overScore");
-    this.txtOverBest = document.getElementById("txt-overBest");
+    // Gameover labels
+    txtOverScore: $("txt-overScore"),
+    txtOverBest: $("txt-overBest"),
 
-    this.btnPlay = document.getElementById("btn-play");
-    this.btnRestart = document.getElementById("btn-restart");
-    this.btnBackMenu = document.getElementById("btn-backMenu");
+    // Panels
+    menu: $("ui-menu"),
+    gameover: $("ui-gameover"),
 
-    this.btnSound = document.getElementById("btn-sound");
-    this.btnSettings = document.getElementById("btn-settings");
-    this.icoSound = document.getElementById("ico-sound");
+    // Sound icon
+    icoSound: $("ico-sound"),
+  };
 
-    this.btnCloseSettings = document.getElementById("btn-closeSettings");
-    this.btnCloseSettings2 = document.getElementById("btn-closeSettings2");
-    this.btnSound2 = document.getElementById("btn-sound2");
-    this.btnRestart2 = document.getElementById("btn-restart2");
+  const api = {
+    onPlay: null,
+    onRestart: null,
+    onBackMenu: null,
+    onToggleSound: null,
 
-    this.onPlay = null;
-    this.onRestart = null;
-    this.onToggleSound = null;
-    this.onSettingsOpen = null;
-    this.onSettingsClose = null;
-    this.onBackMenu = null;
+    // Kept for compatibility (no settings panel now)
+    onSettingsOpen: null,
+    onSettingsClose: null,
 
-    this.btnPlay.addEventListener("click", () => this.onPlay && this.onPlay());
-    this.btnRestart.addEventListener("click", () => this.onRestart && this.onRestart());
-    this.btnBackMenu.addEventListener("click", () => this.onBackMenu && this.onBackMenu());
+    setScore(v) {
+      const val = (v | 0).toString();
+      if (el.txtScore) el.txtScore.textContent = val;
+    },
 
-    this.btnSound.addEventListener("click", () => this.onToggleSound && this.onToggleSound());
-    this.btnSettings.addEventListener("click", () => this.onSettingsOpen && this.onSettingsOpen());
+    setBest(v) {
+      const val = (v | 0);
+      if (el.txtBestTop) el.txtBestTop.textContent = `BEST ${val}`;
+      if (el.txtBestMenu) el.txtBestMenu.textContent = `${val}`;
+      if (el.txtOverBest) el.txtOverBest.textContent = `${val}`;
+    },
 
-    this.btnCloseSettings.addEventListener("click", () => this.onSettingsClose && this.onSettingsClose());
-    this.btnCloseSettings2.addEventListener("click", () => this.onSettingsClose && this.onSettingsClose());
+    setLast(v) {
+      const val = (v | 0);
+      if (el.txtLast) el.txtLast.textContent = `${val}`;
+    },
 
-    this.btnSound2.addEventListener("click", () => this.onToggleSound && this.onToggleSound());
-    this.btnRestart2.addEventListener("click", () => this.onRestart && this.onRestart());
+    setSoundMuted(isMuted) {
+      // If you are using an icon font/svg later, update here only.
+      if (!el.icoSound) return;
+      el.icoSound.textContent = isMuted ? "🔇" : "🔊";
+    },
+
+    showMenu() {
+      if (el.menu) el.menu.classList.remove("ui-hidden");
+      if (el.gameover) el.gameover.classList.add("ui-hidden");
+    },
+
+    showGameOver(score, best) {
+      if (el.menu) el.menu.classList.add("ui-hidden");
+      if (el.gameover) el.gameover.classList.remove("ui-hidden");
+
+      if (el.txtOverScore) el.txtOverScore.textContent = `${score | 0}`;
+      if (el.txtOverBest) el.txtOverBest.textContent = `${best | 0}`;
+    },
+
+    hideAllOverlays() {
+      if (el.menu) el.menu.classList.add("ui-hidden");
+      if (el.gameover) el.gameover.classList.add("ui-hidden");
+    },
+
+    // Settings removed
+    openSettings() {},
+    closeSettings() {},
+  };
+
+  function safeCall(fn) {
+    try { fn && fn(); } catch (_) {}
   }
 
-  setScore(v) {
-    const s = String(v | 0);
-    this.txtScore.textContent = s;
+  function bindOnce() {
+    // Settings panel removed: hide settings button
+    if (el.btnSettings) el.btnSettings.style.display = "none";
+
+    if (el.btnPlay) {
+      el.btnPlay.addEventListener("click", () => safeCall(api.onPlay));
+    }
+
+    if (el.btnRestart) {
+      el.btnRestart.addEventListener("click", () => safeCall(api.onRestart));
+    }
+
+    if (el.btnBackMenu) {
+      el.btnBackMenu.addEventListener("click", () => safeCall(api.onBackMenu));
+    }
+
+    if (el.btnSound) {
+      el.btnSound.addEventListener("click", () => safeCall(api.onToggleSound));
+    }
   }
 
-  setBest(v) {
-    const b = v | 0;
-    this.txtBest.textContent = `BEST ${b}`;
-    if (this.txtBest2) this.txtBest2.textContent = String(b);
-    if (this.txtOverBest) this.txtOverBest.textContent = String(b);
-  }
-
-  setLast(v) {
-    if (this.txtLast) this.txtLast.textContent = String(v | 0);
-  }
-
-  setSoundMuted(isMuted) {
-    if (!this.icoSound) return;
-    this.icoSound.textContent = isMuted ? "🔇" : "🔊";
-  }
-
-  showMenu() {
-    this.menu.classList.remove("ui-hidden");
-    this.over.classList.add("ui-hidden");
-  }
-
-  showGameOver(score, best) {
-    this.menu.classList.add("ui-hidden");
-    this.over.classList.remove("ui-hidden");
-    if (this.txtOverScore) this.txtOverScore.textContent = String(score | 0);
-    if (this.txtOverBest) this.txtOverBest.textContent = String(best | 0);
-  }
-
-  hideAllOverlays() {
-    this.menu.classList.add("ui-hidden");
-    this.over.classList.add("ui-hidden");
-  }
-
-  openSettings() {
-    this.settings.classList.remove("ui-hidden");
-  }
-
-  closeSettings() {
-    this.settings.classList.add("ui-hidden");
-  }
-}
-
-export const UI = new HtmlUI();
+  bindOnce();
+  return api;
+})();

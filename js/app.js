@@ -22,6 +22,13 @@ function setMute(v) {
   localStorage.setItem(MUTE_KEY, v ? "1" : "0");
 }
 
+function syncAudioUtilWithMute(isMuted) {
+  const au = window.AudioUtil;
+  if (!au) return;
+  au.setEnabled(!isMuted);
+  if (!isMuted) au.unlock();
+}
+
 function createGame() {
   if (game) return game;
 
@@ -44,14 +51,25 @@ function createGame() {
   };
 
   game = new Phaser.Game(config);
+
+  // expose for devtools debugging
+  window.__GAME__ = game;
+
+  // apply mute
   game.sound.mute = getMute();
   UI.setSoundMuted(game.sound.mute);
+  syncAudioUtilWithMute(game.sound.mute);
 
   return game;
 }
 
 function startRun() {
   const g = createGame();
+
+  // user gesture unlock + click sfx
+  window.AudioUtil?.unlock();
+  window.AudioUtil?.ui();
+
   UI.hideAllOverlays();
   UI.setScore(0);
 
@@ -61,6 +79,7 @@ function startRun() {
 
 function backToMenu() {
   createGame();
+  window.AudioUtil?.ui();
   UI.showMenu();
 }
 
@@ -69,15 +88,19 @@ function toggleSound() {
   g.sound.mute = !g.sound.mute;
   setMute(g.sound.mute);
   UI.setSoundMuted(g.sound.mute);
+  window.AudioUtil?.ui();
+  syncAudioUtilWithMute(g.sound.mute);
 }
 
 function openSettings() {
   createGame();
+  window.AudioUtil?.ui();
   UI.openSettings();
   if (game) game.scene.pause("GameScene");
 }
 
 function closeSettings() {
+  window.AudioUtil?.ui();
   UI.closeSettings();
   if (game) game.scene.resume("GameScene");
 }
@@ -94,12 +117,11 @@ UI.onPlay = startRun;
 UI.onRestart = startRun;
 UI.onBackMenu = backToMenu;
 UI.onToggleSound = toggleSound;
-UI.onSettingsOpen = openSettings;
-UI.onSettingsClose = closeSettings;
 
-// expose helpers for GameScene to call (optional)
+// expose helpers for GameScene
 window.__STACKING_APP__ = {
   setBest: (v) => { setInt(BEST_KEY, v); UI.setBest(v); },
   setLast: (v) => { setInt(LAST_KEY, v); UI.setLast(v); },
   getBest: () => getInt(BEST_KEY),
 };
+

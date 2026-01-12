@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Stacking Tower</title>
+
+  <link rel="icon" href="data:," />
   <link rel="stylesheet" href="./css/style.css" />
 </head>
 
@@ -43,7 +45,6 @@
           </div>
 
           <button id="btn-play" class="btn-primary">PLAY</button>
-
           <div class="menu-hint">Tap anywhere to drop</div>
         </div>
       </div>
@@ -70,29 +71,14 @@
         </div>
       </div>
 
-      <!-- SETTINGS MODAL -->
-      <div id="ui-settings" class="ui-modal ui-hidden">
-        <div class="modal-backdrop" id="btn-closeSettings"></div>
-        <div class="modal-card">
-          <div class="modal-title">Settings</div>
-
-          <div class="modal-row">
-            <div class="modal-label">Sound</div>
-            <button id="btn-sound2" class="btn-chip">Toggle</button>
-          </div>
-
-          <div class="modal-row">
-            <div class="modal-label">Restart</div>
-            <button id="btn-restart2" class="btn-chip">Restart</button>
-          </div>
-
-          <button id="btn-closeSettings2" class="btn-ghost">Close</button>
         </div>
-      </div>
-    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+
+  <!-- IMPORTANT: load AudioUtil BEFORE modules -->
+  <script src="./js/audio.js"></script>
+
   <script type="module" src="./js/app.js"></script>
 </body>
 </html>

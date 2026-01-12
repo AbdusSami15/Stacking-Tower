@@ -27,11 +27,9 @@ export default class GameScene extends Phaser.Scene {
     this.overhangDropDistance = 1200;
     this.overhangDropDurationMs = 650;
 
-    // camera moves UP each tile (camera only, tiles stay)
     this.cameraStepPerTile = 20;
     this.cameraTweenMs = 170;
 
-    // background + palette
     this.bgRect = null;
     this.paletteBg = [0xe6ffe9, 0xeaf3ff, 0xfff0f6, 0xfff7e6, 0xe9fffb];
     this.paletteBlock = [0x9ee7ff, 0xffb3c7, 0xffe7a3, 0xbfffa6, 0xb7f2ff, 0xffd3a6, 0xd1c4ff];
@@ -42,8 +40,19 @@ export default class GameScene extends Phaser.Scene {
 
     this.bestKey = "stacking_tower_best";
 
-    // prevents ghost showing again while dropping (fixes the grey extra block)
     this.isDropping = false;
+
+    this._audioBound = false;
+  }
+
+  preload() {
+    // Audio assets (ensure files exist in assets/audio/)
+    this.load.audio("tap", "./assets/audio/tap.mp3");
+    this.load.audio("cut", "./assets/audio/cut.mp3");
+    this.load.audio("perfect", "./assets/audio/perfect.mp3");
+    this.load.audio("combo", "./assets/audio/combo.mp3");
+    this.load.audio("lose", "./assets/audio/lose.mp3");
+    this.load.audio("ui", "./assets/audio/ui.mp3");
   }
 
   create() {
@@ -56,23 +65,26 @@ export default class GameScene extends Phaser.Scene {
     UI.setBest(this._getBest());
     UI.hideAllOverlays();
 
+    // bind AudioUtil to this scene once
+    if (!this._audioBound) {
+      this._audioBound = true;
+      window.AudioUtil?.setScene?.(this);
+    }
+
     const width = this.scale.gameSize.width;
     const height = this.scale.gameSize.height;
 
-    // world bounds
     this.physics.world.setBounds(0, -50000, width, 60000);
 
     const cam = this.cameras.main;
     cam.setBounds(0, -50000, width, 60000);
     cam.scrollY = 0;
 
-    // background fixed
     if (this.bgRect) this.bgRect.destroy();
     this.bgRect = this.add.rectangle(width * 0.5, height * 0.5, width, height, this.paletteBg[this.bgIndex], 1);
     this.bgRect.setScrollFactor(0);
     this.bgRect.setDepth(-100);
 
-    // cleanup old blocks
     for (const b of this.blocks) if (b && b.destroy) b.destroy();
     this.blocks.length = 0;
 
@@ -85,7 +97,6 @@ export default class GameScene extends Phaser.Scene {
     this.worldLeft = this.worldPadding;
     this.worldRight = width - this.worldPadding;
 
-    // base near bottom
     const baseY = height - 210;
 
     const base = this._spawnBlock({
@@ -104,9 +115,14 @@ export default class GameScene extends Phaser.Scene {
 
     this.input.off("pointerdown");
     this.input.on("pointerdown", () => {
+      // unlock on first gesture
+      window.AudioUtil?.unlock?.();
+
       if (this.gameOver) return;
       if (!this.activeBlock) return;
       if (this.isDropping) return;
+
+      window.AudioUtil?.tap?.();
       this._dropActiveBlock();
     });
   }
@@ -224,6 +240,9 @@ export default class GameScene extends Phaser.Scene {
       a.x = last.x;
       this.combo += 1;
 
+      if (this.combo >= 2) window.AudioUtil?.combo?.();
+      else window.AudioUtil?.perfect?.();
+
       this._showFeedback(this.combo >= 2 ? "PERFECT" : "GOOD");
       this._shake(true);
 
@@ -236,21 +255,22 @@ export default class GameScene extends Phaser.Scene {
     const overlapW = overlapRight - overlapLeft;
 
     if (overlapW <= 1) {
+      window.AudioUtil?.lose?.();
       this._gameOver(a);
       return;
     }
 
     this.combo = 0;
 
+    window.AudioUtil?.cut?.();
+
     const overhangW = a.displayWidth - overlapW;
     const overlapCenterX = (overlapLeft + overlapRight) * 0.5;
 
-    // keep ONLY overlapped piece
     a.x = overlapCenterX;
     a.displayWidth = overlapW;
     a.body.setSize(overlapW, this.blockHeight, true);
 
-    // spawn falling overhang
     if (overhangW > 1) {
       const isRightOverhang = aRight > lRight;
       const overhangX = isRightOverhang
@@ -299,14 +319,11 @@ export default class GameScene extends Phaser.Scene {
 
     this.speed = Math.min(this.maxSpeed, this.speed + this.speedInc);
 
-    // camera up + bg shift
     this._cameraUpStep();
     this._bgShift();
 
-    // next block
     this._spawnMovingBlock();
 
-    // keep memory low
     if (this.blocks.length > 40) {
       const removeCount = this.blocks.length - 35;
       for (let i = 0; i < removeCount; i++) {
@@ -413,7 +430,6 @@ export default class GameScene extends Phaser.Scene {
     this._setBest(this.score);
     const best = this._getBest();
 
-    // update app + UI
     window.__STACKING_APP__?.setBest?.(best);
     window.__STACKING_APP__?.setLast?.(this.score);
 
