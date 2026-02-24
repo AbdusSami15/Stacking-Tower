@@ -29,7 +29,7 @@ export default class GameScene extends Phaser.Scene {
     this.overhangDropDurationMs = 650;
 
     this.cameraStepPerTile = 42;
-    this.cameraTweenMs = 200;
+    this.cameraTweenMs = 800;
 
     this.bgRect = null;
     this.paletteBg = [0xe6ffe9, 0xeaf3ff, 0xfff0f6, 0xfff7e6, 0xe9fffb];
