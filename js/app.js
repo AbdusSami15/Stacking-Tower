@@ -37,10 +37,8 @@ function createGame() {
     parent: "game",
     backgroundColor: "#0b0f14",
     scale: {
-      mode: Phaser.Scale.FIT,
+      mode: Phaser.Scale.RESIZE,
       autoCenter: Phaser.Scale.CENTER_BOTH,
-      width: 720,
-      height: 1280,
     },
     render: { pixelArt: false, antialias: true, roundPixels: false },
     physics: {

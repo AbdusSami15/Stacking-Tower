@@ -22,13 +22,14 @@ export default class GameScene extends Phaser.Scene {
     this.gameOver = false;
 
     this.worldPadding = 18;
+    this.maxGameWidth = 720;
     this.perfectTolerance = 6;
 
     this.overhangDropDistance = 1200;
     this.overhangDropDurationMs = 650;
 
-    this.cameraStepPerTile = 20;
-    this.cameraTweenMs = 170;
+    this.cameraStepPerTile = 42;
+    this.cameraTweenMs = 200;
 
     this.bgRect = null;
     this.paletteBg = [0xe6ffe9, 0xeaf3ff, 0xfff0f6, 0xfff7e6, 0xe9fffb];
@@ -97,7 +98,7 @@ export default class GameScene extends Phaser.Scene {
     this.worldLeft = this.worldPadding;
     this.worldRight = width - this.worldPadding;
 
-    const baseY = height - 210;
+    const baseY = height - 110;
 
     const base = this._spawnBlock({
       x: width * 0.5,
@@ -111,7 +112,11 @@ export default class GameScene extends Phaser.Scene {
 
     this.blocks.push(base);
 
+    this._updateLayout();
+
     this._spawnMovingBlock();
+
+    this.scale.on("resize", this._onResize, this);
 
     this.input.off("pointerdown");
     this.input.on("pointerdown", () => {
@@ -453,5 +458,30 @@ export default class GameScene extends Phaser.Scene {
   _setBest(score) {
     const best = Math.max(this._getBest(), score | 0);
     localStorage.setItem(this.bestKey, String(best));
+  }
+
+  _onResize(gameSize) {
+    this._updateLayout();
+  }
+
+  _updateLayout() {
+    const width = this.scale.gameSize.width;
+    const height = this.scale.gameSize.height;
+
+    const gameW = Math.min(width, this.maxGameWidth);
+    this.worldLeft = (width - gameW) * 0.5 + this.worldPadding;
+    this.worldRight = (width + gameW) * 0.5 - this.worldPadding;
+
+    if (this.bgRect) {
+      this.bgRect.setPosition(width * 0.5, height * 0.5);
+      this.bgRect.setSize(width, height);
+    }
+
+    if (this.feedbackText) {
+      this.feedbackText.setPosition(width * 0.5, height * 0.38);
+    }
+
+    this.physics.world.setBounds(0, -50000, width, 60000);
+    this.cameras.main.setBounds(0, -50000, width, 60000);
   }
 }
